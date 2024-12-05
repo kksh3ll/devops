@@ -17,6 +17,7 @@ export interface ServerNode {
       total: number;
     };
   };
+  loadAvg?: number[];
   containers: Container[];
 }
 
