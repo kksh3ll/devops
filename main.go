@@ -1,10 +1,10 @@
 package main
 
 import (
-	"log"
+	"devops/internal/alert"
 	"devops/internal/config"
 	"devops/internal/monitor"
-	"devops/internal/alert"
+	"log"
 )
 
 func main() {
@@ -15,7 +15,20 @@ func main() {
 	}
 
 	// Initialize alert manager
-	alertManager := alert.NewManager(cfg.Alert)
+	alertManager, err := alert.NewManager(cfg.Alert)
+	if err != nil {
+		log.Fatalf("Failed to initialize alert manager: %v", err)
+		return
+	}
+	defer alertManager.Close()
+
+	// 设置多种通知方式（示例）
+	composite := alert.NewCompositeNotifier(
+		alert.NewEmailNotifier(cfg.Alert),
+		// 可以添加更多通知器
+		// alert.NewSlackNotifier("your-webhook-url"),
+	)
+	alertManager.SetNotifier(composite)
 
 	// Initialize monitors
 	monitors := []monitor.Monitor{
