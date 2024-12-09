@@ -16,15 +16,9 @@ func StartMonitoring(monitors []Monitor, intervalSeconds int) {
 	ticker := time.NewTicker(time.Duration(intervalSeconds) * time.Second)
 	defer ticker.Stop()
 
-	for _, m := range monitors {
-		if m.IsEnabled() {
-			if err := m.Start(); err != nil {
-				continue
-			}
-		}
-	}
-
-	for range ticker.C {
+	// 创建一个无限循环
+	for {
+		// 执行所有启用的监控器
 		for _, m := range monitors {
 			if m.IsEnabled() {
 				if err := m.Start(); err != nil {
@@ -32,5 +26,8 @@ func StartMonitoring(monitors []Monitor, intervalSeconds int) {
 				}
 			}
 		}
+
+		// 等待下一个时间间隔
+		<-ticker.C
 	}
 }
